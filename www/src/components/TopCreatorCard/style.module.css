@@ -1,0 +1,23 @@
+.card {
+  justify-content: space-between;
+  padding-bottom: 4em;
+}
+
+.profileImage {
+  aspect-ratio: 1;
+  object-fit: cover;
+  border-radius: 100%;
+  width: 12em;
+  box-shadow: 0 0 1em 0.5em rgba(0, 0, 0, 0.1);
+}
+
+.bubble1 {
+  top: -23em;
+  left: -14em;
+  width: 35em;
+}
+
+.bubble2 {
+  bottom: -14em;
+  width: 23em;
+}

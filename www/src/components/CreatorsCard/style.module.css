@@ -1,0 +1,22 @@
+.channels {
+  display: flex;
+  flex-wrap: wrap;
+  position: relative;
+}
+
+.channels img {
+  width: 3em;
+  height: 3em;
+}
+
+.bubble1 {
+  top: -23em;
+  left: -22em;
+  width: 35em;
+}
+
+.bubble2 {
+  right: -10em;
+  bottom: -14em;
+  width: 30em;
+}
