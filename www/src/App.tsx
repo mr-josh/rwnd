@@ -5,8 +5,8 @@ import { MantineProvider } from "@mantine/core";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { Video } from "interfaces/video";
 import { useState } from "react";
-import TopCreatorCard from "components/TopCreatorCard";
 import { useGoogleLogin } from "@react-oauth/google";
+import TopCreatorCard from "components/TopCreatorCard";
 import MostWatchedCard from "components/MostWatchedCard";
 import CreatorsCard from "components/CreatorsCard";
 
