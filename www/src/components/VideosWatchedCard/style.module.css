@@ -1,0 +1,16 @@
+.card {
+  justify-content: space-between;
+  padding-bottom: 4em;
+}
+
+.bubble1 {
+  top: -23em;
+  right: -14em;
+  width: 35em;
+}
+
+.bubble2 {
+  right: 2em;
+  bottom: 1em;
+  width: 18em;
+}

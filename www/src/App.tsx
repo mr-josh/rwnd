@@ -9,6 +9,7 @@ import { useGoogleLogin } from "@react-oauth/google";
 import TopCreatorCard from "components/TopCreatorCard";
 import MostWatchedCard from "components/MostWatchedCard";
 import CreatorsCard from "components/CreatorsCard";
+import VideosWatchedCard from "components/VideosWatchedCard";
 
 const App = () => {
   const [watchHistory, setWatchHistory] = useState<Array<Video>>([]);
@@ -41,6 +42,10 @@ const App = () => {
         </div>
         {watchHistory.length > 0 ? (
           <div className="cards">
+            <VideosWatchedCard
+              watchHistory={watchHistory}
+              accessToken={accessToken || ""}
+            />
             <CreatorsCard
               watchHistory={watchHistory}
               accessToken={accessToken || ""}
@@ -56,15 +61,12 @@ const App = () => {
           </div>
         ) : (
           <>
-            {!accessToken ? (
-              <button onClick={() => login()}>Login</button>
-            ) : (
-              <Dropzone onDrop={loadWatchHistory} accept={["application/json"]}>
-                <h2>Upload your watch-history.json</h2>
-                <p>Click here to select your watch-history.json file</p>
-                <p>or drag and drop it here to upload</p>
-              </Dropzone>
-            )}
+            <Dropzone onDrop={loadWatchHistory} accept={["application/json"]}>
+              <h2>Upload your watch-history.json</h2>
+              <p>Click here to select your watch-history.json file</p>
+              <p>or drag and drop it here to upload</p>
+            </Dropzone>
+            <button onClick={() => login()}>Login for Channel Profile Pictures</button>
           </>
         )}
       </MantineProvider>
