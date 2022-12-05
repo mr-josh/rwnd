@@ -175,10 +175,8 @@ const App = () => {
               </Button.Group>
               <hr style={{ width: "100%", borderColor: "white" }} />
               <div className="ad">
-                <sup>
-                  This ad below helps pay to keep the website up. It's the only
-                  ad you'll ever see!
-                </sup>
+                <Text size="xs">This ad below helps pay to keep the website up.</Text>
+                <Text size="xs">It's the only ad you'll ever see!</Text>
                 <script
                   async
                   src="https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-4301858556408185"
