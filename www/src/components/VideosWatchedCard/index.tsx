@@ -32,7 +32,10 @@ const VideosWatchedCard = (props: {
         <h1>You've watched {watched.watched} Videos</h1>
         <p>since {watched.since.toLocaleDateString()}</p>
       </div>
-      <p>Let's see what else you've been up to on YouTube...</p>
+      <div>
+        <p>Let's see what else you've been up to on YouTube...</p>
+        <sub>(Click and drag or select the tabs below to move between cards)</sub>
+      </div>
     </div>
   );
 };

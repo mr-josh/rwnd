@@ -2,6 +2,7 @@ import "theme/style.css";
 
 import { BrowserRouter } from "react-router-dom";
 import { MantineProvider } from "@mantine/core";
+import { Carousel } from "@mantine/carousel";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { Video } from "interfaces/video";
 import { useState } from "react";
@@ -40,34 +41,72 @@ const App = () => {
           <h1>RWND</h1>
           <p>Your personal YouTube Rewind</p>
         </div>
-        {watchHistory.length > 0 ? (
-          <div className="cards">
-            <VideosWatchedCard
-              watchHistory={watchHistory}
-            />
-            <CreatorsCard
-              watchHistory={watchHistory}
-              accessToken={accessToken}
-            />
-            <MostWatchedCard
-              watchHistory={watchHistory}
-              accessToken={accessToken}
-            />
-            <TopCreatorCard
-              watchHistory={watchHistory}
-              accessToken={accessToken}
-            />
-          </div>
-        ) : (
-          <>
-            <Dropzone onDrop={loadWatchHistory} accept={["application/json"]}>
-              <h2>Upload your watch-history.json</h2>
-              <p>Click here to select your watch-history.json file</p>
-              <p>or drag and drop it here to upload</p>
-            </Dropzone>
-            <button onClick={() => login()}>Login for Channel Profile Pictures</button>
-          </>
-        )}
+        <div className="page-content">
+          {watchHistory.length > 0 ? (
+            <Carousel
+              className="cards"
+              slideSize="min-content"
+              slideGap="lg"
+              withIndicators
+              withControls={false}
+              styles={{
+                root: {
+                  width: "100%",
+                },
+                viewport: {
+                  width: "100%",
+                  overflow: "visible",
+                },
+                indicator: {
+                  height: 10,
+                }
+              }}
+            >
+              <Carousel.Slide>
+                <VideosWatchedCard watchHistory={watchHistory} />
+              </Carousel.Slide>
+              <Carousel.Slide>
+                <CreatorsCard
+                  watchHistory={watchHistory}
+                  accessToken={accessToken}
+                />
+              </Carousel.Slide>
+              <Carousel.Slide>
+                <MostWatchedCard
+                  watchHistory={watchHistory}
+                  accessToken={accessToken}
+                />
+              </Carousel.Slide>
+              <Carousel.Slide>
+                <TopCreatorCard
+                  watchHistory={watchHistory}
+                  accessToken={accessToken}
+                />
+              </Carousel.Slide>
+            </Carousel>
+          ) : (
+            <div className="start">
+              <button onClick={() => login()}>
+                Login for Channel Profile Pictures
+              </button>
+              <Dropzone
+                getFilesFromEvent={(e) => {
+                  // Bug in @mantine/dropzone (https://github.com/mantinedev/mantine/issues/3115)
+                  return Promise.resolve([
+                    // @ts-ignore
+                    ...(e.target as EventTarget & HTMLInputElement)?.files,
+                  ]);
+                }}
+                onDrop={loadWatchHistory}
+                accept={["application/json"]}
+              >
+                <h2>Upload your watch-history.json</h2>
+                <p>Click here to select your watch-history.json file</p>
+                <p>or drag and drop it here to upload</p>
+              </Dropzone>
+            </div>
+          )}
+        </div>
       </MantineProvider>
     </BrowserRouter>
   );
