@@ -138,18 +138,35 @@ const App = () => {
                 </div>
               </Group>
             </Dropzone>
-            <Button
-              component="a"
-              href="/guide"
-              target="_blank"
-              color="yellow"
-              fullWidth
-            >
-              <span style={{ marginRight: "0.5rem" }}>
-                How do I get my "watch-history.json" file?
-              </span>
-              <IconExternalLink size={16} />
-            </Button>
+            <Button.Group>
+              <Button
+                component="a"
+                href="/about"
+                target="_blank"
+                color="yellow"
+              >
+                <span style={{ marginRight: "0.5rem" }}>About</span>
+                <IconExternalLink size={16} />
+              </Button>
+              <Button
+                component="a"
+                href="/guide"
+                target="_blank"
+                color="yellow"
+              >
+                <span style={{ marginRight: "0.5rem" }}>Guide</span>
+                <IconExternalLink size={16} />
+              </Button>
+              <Button
+                component="a"
+                href="/privacy"
+                target="_blank"
+                color="yellow"
+              >
+                <span style={{ marginRight: "0.5rem" }}>Privacy</span>
+                <IconExternalLink size={16} />
+              </Button>
+            </Button.Group>
           </div>
         )}
       </div>
