@@ -1,7 +1,14 @@
 import "theme/style.css";
 
-import { BrowserRouter } from "react-router-dom";
-import { MantineProvider } from "@mantine/core";
+import {
+  Button,
+  Group,
+  MantineProvider,
+  Notification,
+  Text,
+  Tooltip,
+} from "@mantine/core";
+import { IconCheck, IconUpload, IconExternalLink } from "@tabler/icons";
 import { Carousel } from "@mantine/carousel";
 import { Dropzone, FileWithPath } from "@mantine/dropzone";
 import { Video } from "interfaces/video";
@@ -35,80 +42,118 @@ const App = () => {
   });
 
   return (
-    <BrowserRouter>
-      <MantineProvider theme={{ colorScheme: "dark" }}>
-        <div className="page-header">
-          <h1>RWND</h1>
-          <p>Your personal YouTube Rewind</p>
-        </div>
-        <div className="page-content">
-          {watchHistory.length > 0 ? (
-            <Carousel
-              className="cards"
-              slideSize="min-content"
-              slideGap="lg"
-              withIndicators
-              withControls={false}
-              styles={{
-                root: {
-                  width: "100%",
-                },
-                viewport: {
-                  width: "100%",
-                  overflow: "visible",
-                },
-                indicator: {
-                  height: 10,
+    <MantineProvider theme={{ colorScheme: "dark" }}>
+      <div className="page-header">
+        <h1>RWND</h1>
+        <p>Your personal YouTube Rewind</p>
+      </div>
+      <div className="page-content">
+        {watchHistory.length > 0 ? (
+          <Carousel
+            className="cards"
+            slideSize="min-content"
+            slideGap="lg"
+            withIndicators
+            withControls={false}
+            styles={{
+              root: {
+                width: "100%",
+              },
+              viewport: {
+                width: "100%",
+                overflow: "visible",
+              },
+              indicator: {
+                height: 10,
+              },
+            }}
+          >
+            <Carousel.Slide>
+              <VideosWatchedCard watchHistory={watchHistory} />
+            </Carousel.Slide>
+            <Carousel.Slide>
+              <CreatorsCard
+                watchHistory={watchHistory}
+                accessToken={accessToken}
+              />
+            </Carousel.Slide>
+            <Carousel.Slide>
+              <MostWatchedCard
+                watchHistory={watchHistory}
+                accessToken={accessToken}
+              />
+            </Carousel.Slide>
+            <Carousel.Slide>
+              <TopCreatorCard
+                watchHistory={watchHistory}
+                accessToken={accessToken}
+              />
+            </Carousel.Slide>
+          </Carousel>
+        ) : (
+          <div className="start">
+            {!accessToken ? (
+              <Tooltip
+                label={
+                  <>
+                    <p>You don't have to do this if you want to be secure!</p>
+                    <p>You just won't see any channel profile pictures</p>
+                  </>
                 }
-              }}
-            >
-              <Carousel.Slide>
-                <VideosWatchedCard watchHistory={watchHistory} />
-              </Carousel.Slide>
-              <Carousel.Slide>
-                <CreatorsCard
-                  watchHistory={watchHistory}
-                  accessToken={accessToken}
-                />
-              </Carousel.Slide>
-              <Carousel.Slide>
-                <MostWatchedCard
-                  watchHistory={watchHistory}
-                  accessToken={accessToken}
-                />
-              </Carousel.Slide>
-              <Carousel.Slide>
-                <TopCreatorCard
-                  watchHistory={watchHistory}
-                  accessToken={accessToken}
-                />
-              </Carousel.Slide>
-            </Carousel>
-          ) : (
-            <div className="start">
-              <button onClick={() => login()}>
-                Login for Channel Profile Pictures
-              </button>
-              <Dropzone
-                getFilesFromEvent={(e) => {
-                  // Bug in @mantine/dropzone (https://github.com/mantinedev/mantine/issues/3115)
-                  return Promise.resolve([
-                    // @ts-ignore
-                    ...(e.target as EventTarget & HTMLInputElement)?.files,
-                  ]);
-                }}
-                onDrop={loadWatchHistory}
-                accept={["application/json"]}
               >
-                <h2>Upload your watch-history.json</h2>
-                <p>Click here to select your watch-history.json file</p>
-                <p>or drag and drop it here to upload</p>
-              </Dropzone>
-            </div>
-          )}
-        </div>
-      </MantineProvider>
-    </BrowserRouter>
+                <Button onClick={() => login()} color="teal" fullWidth>
+                  Login for Channel Profile Pictures
+                </Button>
+              </Tooltip>
+            ) : (
+              <Notification
+                icon={<IconCheck size={20} />}
+                title="Success!"
+                color="green"
+                disallowClose
+                radius="md"
+              >
+                You're logged in and should see channel profile pictures.
+              </Notification>
+            )}
+            <Dropzone
+              getFilesFromEvent={(e) => {
+                // Bug in @mantine/dropzone (https://github.com/mantinedev/mantine/issues/3115)
+                return Promise.resolve([
+                  // @ts-ignore
+                  ...(e.target as EventTarget & HTMLInputElement)?.files,
+                ]);
+              }}
+              onDrop={loadWatchHistory}
+              accept={["application/json"]}
+            >
+              <Group position="center" spacing="xl">
+                <IconUpload size={40} />
+                <div>
+                  <Text size="xl">Upload your watch-history.json</Text>
+                  <Text color="dimmed">
+                    Click here to select your watch-history.json file
+                  </Text>
+                  <Text color="dimmed">or drag and drop it here to upload</Text>
+                </div>
+              </Group>
+            </Dropzone>
+            <Button
+              component="a"
+              href="/guide"
+              target="_blank"
+              color="yellow"
+              fullWidth
+            >
+              <span style={{ marginRight: "0.5rem" }}>
+                How do I get my "watch-history.json" file?
+              </span>
+              <IconExternalLink size={16} />
+            </Button>
+          </div>
+        )}
+      </div>
+    </MantineProvider>
   );
 };
 
