@@ -4,7 +4,6 @@ import style from "./style.module.css";
 
 const VideosWatchedCard = (props: {
   watchHistory: Video[];
-  accessToken: string;
 }) => {
   let watched = useMemo(() => {
     let uniqueVideos = new Map<string, Video>(

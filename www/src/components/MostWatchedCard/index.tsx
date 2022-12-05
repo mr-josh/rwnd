@@ -1,11 +1,13 @@
+import style from "./style.module.css";
+
 import { Video } from "interfaces/video";
 import { useMemo, useState } from "react";
-import style from "./style.module.css";
 import { motion } from "framer-motion";
+import { toSvg } from "jdenticon";
 
 const MostWatchedCard = (props: {
   watchHistory: Video[];
-  accessToken: string;
+  accessToken?: string | null;
 }) => {
   const [pics, setPic] = useState<{ [key: string]: string }>({});
   let topChannels = useMemo(() => {
@@ -33,32 +35,42 @@ const MostWatchedCard = (props: {
       })
       .slice(0, 7);
 
-    (async () => {
-      let channelsString = channels
-        .map((channel) => channel.url.split("/").at(-1))
-        .join(",");
-      let response = await fetch(
-        `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid`,
-        {
-          headers: {
-            Authorization: `Bearer ${props.accessToken}`,
+    if (props.accessToken) {
+      (async () => {
+        let channelsString = channels
+          .map((channel) => channel.url.split("/").at(-1))
+          .join(",");
+        let response = await fetch(
+          `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid`,
+          {
+            headers: {
+              Authorization: `Bearer ${props.accessToken}`,
+            },
+          }
+        );
+
+        // TODO: Add error handling (rate limiting)
+        let data = await response.json();
+
+        let profilePics = data.items.reduce(
+          (acc: { [key: string]: string }, item: any) => {
+            acc[item.id] = item.snippet.thumbnails.default.url;
+            return acc;
           },
-        }
-      );
+          {}
+        );
 
-      // TODO: Add error handling (rate limiting)
-      let data = await response.json();
-
-      let profilePics = data.items.reduce(
-        (acc: { [key: string]: string }, item: any) => {
-          acc[item.id] = item.snippet.thumbnails.default.url;
-          return acc;
-        },
-        {}
-      );
-
-      setPic(profilePics);
-    })();
+        setPic(profilePics);
+      })();
+    } else {
+      for (const channel of channels) {
+        let b64 = window.btoa(toSvg(channel.url, 48, { backColor: "#fff" }));
+        setPic((prev) => ({
+          ...prev,
+          [channel.url.split("/").at(-1)!]: `data:image/svg+xml;base64,${b64}`,
+        }));
+      }
+    }
 
     return channels;
   }, [props.watchHistory]);

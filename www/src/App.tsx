@@ -44,19 +44,18 @@ const App = () => {
           <div className="cards">
             <VideosWatchedCard
               watchHistory={watchHistory}
-              accessToken={accessToken || ""}
             />
             <CreatorsCard
               watchHistory={watchHistory}
-              accessToken={accessToken || ""}
+              accessToken={accessToken}
             />
             <MostWatchedCard
               watchHistory={watchHistory}
-              accessToken={accessToken || ""}
+              accessToken={accessToken}
             />
             <TopCreatorCard
               watchHistory={watchHistory}
-              accessToken={accessToken || ""}
+              accessToken={accessToken}
             />
           </div>
         ) : (
