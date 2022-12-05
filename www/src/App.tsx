@@ -96,7 +96,10 @@ const App = () => {
               <Tooltip
                 label={
                   <>
-                    <p>You don't have to do this if you want to be secure!</p>
+                    <p>
+                      You don't have to do this if you're worried about
+                      security!
+                    </p>
                     <p>You just won't see any channel profile pictures</p>
                   </>
                 }
