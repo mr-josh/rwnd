@@ -7,7 +7,7 @@ const MostWatchedCard = (props: {
   watchHistory: Video[];
   accessToken: string;
 }) => {
-  const [pics, setPic] = useState<string[]>([]);
+  const [pics, setPic] = useState<{ [key: string]: string }>({});
   let topChannels = useMemo(() => {
     // Find the top creator
     let creatorsWatched: Map<
@@ -34,29 +34,30 @@ const MostWatchedCard = (props: {
       .slice(0, 7);
 
     (async () => {
-      for (const channel of channels) {
-        let response = await fetch(
-          `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channel.url
-            .split("/")
-            .at(-1)}&fields=items%2Fsnippet%2Fthumbnails`,
-          {
-            headers: {
-              Authorization: `Bearer ${props.accessToken}`,
-            },
-          }
-        );
+      let channelsString = channels
+        .map((channel) => channel.url.split("/").at(-1))
+        .join(",");
+      let response = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid`,
+        {
+          headers: {
+            Authorization: `Bearer ${props.accessToken}`,
+          },
+        }
+      );
 
-        // TODO: Add error handling (rate limiting)
-        let data = await response.json();
+      // TODO: Add error handling (rate limiting)
+      let data = await response.json();
 
-        await new Promise((resolve, _reject) => {
-          setTimeout(() => {
-            resolve(null);
-          }, 500);
-        });
+      let profilePics = data.items.reduce(
+        (acc: { [key: string]: string }, item: any) => {
+          acc[item.id] = item.snippet.thumbnails.default.url;
+          return acc;
+        },
+        {}
+      );
 
-        setPic((prev) => [...prev, data.items[0].snippet.thumbnails.high.url]);
-      }
+      setPic(profilePics);
     })();
 
     return channels;
@@ -68,11 +69,11 @@ const MostWatchedCard = (props: {
       <div className={`${style.bubble} ${style.bubble2}`}></div>
       <div className="header">
         <h1>These channels</h1>
-        <p>you watched the most...</p>
+        <p>you watch the most...</p>
       </div>
       <div className={style.channels}>
         {topChannels.map((channel, i) => {
-          if (i < 3 && pics[i])
+          if (i < 3)
             return (
               <motion.article
                 key={i}
@@ -80,7 +81,7 @@ const MostWatchedCard = (props: {
                 animate={{ opacity: 1, y: 0 }}
               >
                 <a href={channel.url} target="_blank">
-                  <img src={pics[i]} />
+                  <img src={pics[channel.url.split("/").at(-1)!]} />
                 </a>
                 <div>
                   <a href={channel.url} target="_blank">
@@ -98,7 +99,7 @@ const MostWatchedCard = (props: {
           }}
         >
           {topChannels.map((channel, i) => {
-            if (i < 3 || !pics[i]) return;
+            if (i < 3) return;
             return (
               <div
                 key={i}
@@ -116,7 +117,7 @@ const MostWatchedCard = (props: {
                   href={channel.url}
                   target="_blank"
                 >
-                  <img src={pics[i]} />
+                  <img src={pics[channel.url.split("/").at(-1)!]} />
                 </motion.a>
                 <p>{channel.count} videos</p>
               </div>

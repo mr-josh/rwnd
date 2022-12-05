@@ -7,7 +7,7 @@ const CreatorsCard = (props: {
   watchHistory: Video[];
   accessToken: string;
 }) => {
-  const [pics, setPic] = useState<string[]>([]);
+  const [pics, setPic] = useState<{ [key: string]: string }>({});
   let channels = useMemo(() => {
     // Find the top creator
     let creatorsWatched: Map<
@@ -34,29 +34,30 @@ const CreatorsCard = (props: {
       .slice(0, 50);
 
     (async () => {
-      for (const channel of channels) {
-        let response = await fetch(
-          `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channel.url
-            .split("/")
-            .at(-1)}&fields=items%2Fsnippet%2Fthumbnails`,
-          {
-            headers: {
-              Authorization: `Bearer ${props.accessToken}`,
-            },
-          }
-        );
+      let channelsString = channels
+        .map((channel) => channel.url.split("/").at(-1))
+        .join(",");
+      let response = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid`,
+        {
+          headers: {
+            Authorization: `Bearer ${props.accessToken}`,
+          },
+        }
+      );
 
-        // TODO: Add error handling (rate limiting)
-        let data = await response.json();
+      // TODO: Add error handling (rate limiting)
+      let data = await response.json();
 
-        await new Promise((resolve, _reject) => {
-          setTimeout(() => {
-            resolve(null);
-          }, 500);
-        });
+      let profilePics = data.items.reduce(
+        (acc: { [key: string]: string }, item: any) => {
+          acc[item.id] = item.snippet.thumbnails.default.url;
+          return acc;
+        },
+        {}
+      );
 
-        setPic((prev) => [...prev, data.items[0].snippet.thumbnails.high.url]);
-      }
+      setPic(profilePics);
     })();
 
     return {
@@ -72,8 +73,7 @@ const CreatorsCard = (props: {
       <div className="header">
         <h1>You've watched {channels.count} different creators</h1>
         <div className={style.channels}>
-          {channels.showcaseChannels.map((channel, index) => {
-            if (!pics[index]) return;
+          {channels.showcaseChannels.map((channel) => {
             return (
               <motion.a
                 key={channel.url}
@@ -83,7 +83,10 @@ const CreatorsCard = (props: {
                 href={channel.url}
                 target="_blank"
               >
-                <img src={pics[index]} alt={channel.name} />
+                <img
+                  src={pics[channel.url.split("/").at(-1)!]}
+                  alt={channel.name}
+                />
               </motion.a>
             );
           })}
