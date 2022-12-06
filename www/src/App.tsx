@@ -121,13 +121,6 @@ const App = () => {
                 </Notification>
               )}
               <Dropzone
-                getFilesFromEvent={(e) => {
-                  // Bug in @mantine/dropzone (https://github.com/mantinedev/mantine/issues/3115)
-                  return Promise.resolve([
-                    // @ts-ignore
-                    ...(e.target as EventTarget & HTMLInputElement)?.files,
-                  ]);
-                }}
                 onDrop={loadWatchHistory}
                 accept={["application/json"]}
               >
