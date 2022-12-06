@@ -93,7 +93,23 @@ const MostWatchedCard = (props: {
                 animate={{ opacity: 1, y: 0 }}
               >
                 <a href={channel.url} target="_blank">
-                  <img src={pics[channel.url.split("/").at(-1)!]} />
+                  <img
+                    src={pics[channel.url.split("/").at(-1)!]}
+                    onError={(e) => {
+                      // If failed, use jdenticon
+                      let original = e.currentTarget.src;
+                      let b64 = window.btoa(
+                        toSvg(original, 48, { backColor: "#fff" })
+                      );
+                      e.currentTarget.src = `data:image/svg+xml;base64,${b64}`;
+
+                      // Try again after 1-2 seconds
+                      const retry = function (this: typeof e) {
+                        this.currentTarget.src = original;
+                      };
+                      setTimeout(retry.bind(e), 1000 + Math.random() * 1000);
+                    }}
+                  />
                 </a>
                 <div>
                   <a href={channel.url} target="_blank">
@@ -129,7 +145,23 @@ const MostWatchedCard = (props: {
                   href={channel.url}
                   target="_blank"
                 >
-                  <img src={pics[channel.url.split("/").at(-1)!]} />
+                  <img
+                    src={pics[channel.url.split("/").at(-1)!]}
+                    onError={(e) => {
+                      // If failed, use jdenticon
+                      let original = e.currentTarget.src;
+                      let b64 = window.btoa(
+                        toSvg(original, 48, { backColor: "#fff" })
+                      );
+                      e.currentTarget.src = `data:image/svg+xml;base64,${b64}`;
+
+                      // Try again after 1-2 seconds
+                      const retry = function (this: typeof e) {
+                        this.currentTarget.src = original;
+                      };
+                      setTimeout(retry.bind(e), 1000 + Math.random() * 1000);
+                    }}
+                  />
                 </motion.a>
                 <p>{channel.count} videos</p>
               </div>

@@ -56,7 +56,7 @@ const TopCreatorCard = (props: {
       })();
     } else {
       // Base64 encoded SVG
-      let b64 = window.btoa(toSvg(creator.url, 800, {backColor: "#fff"}));
+      let b64 = window.btoa(toSvg(creator.url, 800, { backColor: "#fff" }));
       setPic(`data:image/svg+xml;base64,${b64}`);
     }
 
@@ -73,6 +73,18 @@ const TopCreatorCard = (props: {
       </div>
       <img
         src={pic || "https://via.placeholder.com/800"}
+        onError={(e) => {
+          // If failed, use jdenticon
+          let original = e.currentTarget.src;
+          let b64 = window.btoa(toSvg(original, 48, { backColor: "#fff" }));
+          e.currentTarget.src = `data:image/svg+xml;base64,${b64}`;
+
+          // Try again after 1-2 seconds
+          const retry = function (this: typeof e) {
+            this.currentTarget.src = original;
+          };
+          setTimeout(retry.bind(e), 1000 + Math.random() * 1000);
+        }}
         className={style.profileImage}
       ></img>
       <a href={topCreator.url} target="_blank">
