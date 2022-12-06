@@ -33,7 +33,7 @@ const CreatorsCard = (props: {
       .sort((a, b) => {
         return b.count - a.count;
       })
-      .slice(0, 50);
+      .slice(0, 56);
 
     if (props.accessToken) {
       (async () => {
