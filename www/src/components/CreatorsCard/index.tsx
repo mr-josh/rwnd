@@ -5,10 +5,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { toSvg } from "jdenticon";
 
-const CreatorsCard = (props: {
-  watchHistory: Video[];
-  accessToken?: string | null;
-}) => {
+const CreatorsCard = (props: { watchHistory: Video[] }) => {
   const [pics, setPic] = useState<{ [key: string]: string }>({});
   let channels = useMemo(() => {
     // Find the top creator
@@ -35,43 +32,28 @@ const CreatorsCard = (props: {
       })
       .slice(0, 48);
 
-    if (props.accessToken) {
-      (async () => {
-        let channelsString = channels
-          .map((channel) => channel.url.split("/").at(-1))
-          .join(",");
-        let response = await fetch(
-          `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid`,
-          {
-            headers: {
-              Authorization: `Bearer ${props.accessToken}`,
-            },
-          }
-        );
+    (async () => {
+      let channelsString = channels
+        .map((channel) => channel.url.split("/").at(-1))
+        .join(",");
+      let response = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${channelsString}&fields=items%2Fsnippet%2Fthumbnails,items%2Fid&key=${
+          import.meta.env.VITE_YT_API_KEY
+        }`
+      );
 
-        // TODO: Add error handling (rate limiting)
-        let data = await response.json();
+      let data = await response.json();
 
-        let profilePics = data.items.reduce(
-          (acc: { [key: string]: string }, item: any) => {
-            acc[item.id] = item.snippet.thumbnails.default.url;
-            return acc;
-          },
-          {}
-        );
+      let profilePics = data.items.reduce(
+        (acc: { [key: string]: string }, item: any) => {
+          acc[item.id] = item.snippet.thumbnails.default.url;
+          return acc;
+        },
+        {}
+      );
 
-        setPic(profilePics);
-      })();
-    } else {
-      for (const channel of channels) {
-        // Base64 encoded SVG
-        let b64 = window.btoa(toSvg(channel.url, 48, { backColor: "#fff" }));
-        setPic((prev) => ({
-          ...prev,
-          [channel.url.split("/").at(-1)!]: `data:image/svg+xml;base64,${b64}`,
-        }));
-      }
-    }
+      setPic(profilePics);
+    })();
 
     return {
       count: creatorsWatched.size,
@@ -99,16 +81,17 @@ const CreatorsCard = (props: {
                 <img
                   src={pics[channel.url.split("/").at(-1)!]}
                   onError={(e) => {
+                    const target = e.currentTarget as HTMLImageElement;
                     // If failed, use jdenticon
-                    let original = e.currentTarget.src;
+                    let original = target.src;
                     let b64 = window.btoa(
                       toSvg(original, 48, { backColor: "#fff" })
                     );
-                    e.currentTarget.src = `data:image/svg+xml;base64,${b64}`;
+                    target.src = `data:image/svg+xml;base64,${b64}`;
 
                     // Try again after 1-2 seconds
                     const retry = function (this: typeof e) {
-                      this.currentTarget.src = original;
+                      target.src = original;
                     };
                     setTimeout(retry.bind(e), 1000 + Math.random() * 1000);
                   }}

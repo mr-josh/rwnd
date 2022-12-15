@@ -4,10 +4,7 @@ import { Video } from "interfaces/video";
 import { useMemo, useState } from "react";
 import { toSvg } from "jdenticon";
 
-const TopCreatorCard = (props: {
-  watchHistory: Video[];
-  accessToken?: string | null;
-}) => {
+const TopCreatorCard = (props: { watchHistory: Video[] }) => {
   const [pic, setPic] = useState<string>();
   let topCreator = useMemo(() => {
     // Find the top creator
@@ -36,29 +33,20 @@ const TopCreatorCard = (props: {
       prev.count > curr.count ? prev : curr
     );
 
-    if (props.accessToken) {
-      (async () => {
-        let response = await fetch(
-          `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${creator.url
-            .split("/")
-            .at(-1)}&fields=items%2Fsnippet%2Fthumbnails`,
-          {
-            headers: {
-              Authorization: `Bearer ${props.accessToken}`,
-            },
-          }
-        );
+    (async () => {
+      let response = await fetch(
+        `https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${creator.url
+          .split("/")
+          .at(-1)}&fields=items%2Fsnippet%2Fthumbnails&key=${
+          import.meta.env.VITE_YT_API_KEY
+        }`
+      );
 
-        // TODO: Add error handling (rate limiting)
-        let data = await response.json();
+      // TODO: Add error handling (rate limiting)
+      let data = await response.json();
 
-        setPic(data.items[0].snippet.thumbnails.high.url);
-      })();
-    } else {
-      // Base64 encoded SVG
-      let b64 = window.btoa(toSvg(creator.url, 800, { backColor: "#fff" }));
-      setPic(`data:image/svg+xml;base64,${b64}`);
-    }
+      setPic(data.items[0].snippet.thumbnails.high.url);
+    })();
 
     return creator;
   }, [props.watchHistory]);
@@ -74,14 +62,15 @@ const TopCreatorCard = (props: {
       <img
         src={pic || "https://via.placeholder.com/800"}
         onError={(e) => {
+          const target = e.currentTarget as HTMLImageElement;
           // If failed, use jdenticon
-          let original = e.currentTarget.src;
+          let original = target.src;
           let b64 = window.btoa(toSvg(original, 48, { backColor: "#fff" }));
-          e.currentTarget.src = `data:image/svg+xml;base64,${b64}`;
+          target.src = `data:image/svg+xml;base64,${b64}`;
 
           // Try again after 1-2 seconds
           const retry = function (this: typeof e) {
-            this.currentTarget.src = original;
+            target.src = original;
           };
           setTimeout(retry.bind(e), 1000 + Math.random() * 1000);
         }}
